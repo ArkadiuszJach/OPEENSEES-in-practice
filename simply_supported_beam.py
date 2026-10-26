@@ -25,7 +25,11 @@ Model: 2D , 3 dof per node (UX, UY, RZ)
 Algorithm: linear
 Analysis: Static  
 
-Load: Point load P = 10 kN at midspan + uniformly distributed load q = 5 kN/m on the entire span + self-weight of the beam
+Load:
+Point load P1 = 10 kN at midspan 
++ uniformly distributed load q = 2 kN/m on the entire span 
++ self-weight of the beam
++ horizontal point load at the left support node (10 kN)
 
 """
 
@@ -36,7 +40,8 @@ E = 210e6     # kN/m2
 I = 8357e-8   # m4 
 
 # load values
-P =  5.0      # kN
+P1 = 10.0     # kN
+P2 = 5.0      # kN
 q =  2.0      # kN/m
 sw = 42.2e-2  # kN/m
 
@@ -66,11 +71,11 @@ ops.timeSeries('Linear', 1) # first order theory
 ops.pattern('Plain', 1, 1)  # static load pattern 
 
 " LOADS "
-ops.eleLoad('-ele', 1, '-type', '-beamPoint', -P , 0.5)
+ops.eleLoad('-ele', 1, '-type', '-beamPoint', -P1 , 0.5)
 ops.eleLoad('-ele', 1,2, '-type', '-beamUniform',-q-sw)
 
 #node loads
-ops.load(1, 10, 0.0, 0.0)
+ops.load(1, P2, 0.0, 0.0)
 
 
 " ANALYSIS "
@@ -83,8 +88,8 @@ ops.analysis('Static')              # Typ analizy: Static
 
 ops.analyze(1) 
 
-" RESULTS "
 
+" RESULTS "
 ops.reactions()
 print("\n--- REACTIONS [kN, kNm] ---")
 for n in ops.getNodeTags():
@@ -96,8 +101,8 @@ for n in ops.getNodeTags():
     ux, uy, rz = ops.nodeDisp(n)
     print(f"Node {n}: ux = {ux*1000:.3f} mm, uy = {uy*1000:.3f} mm, rz = {rz:.6f} rad")
 
-" VISUALIZATION "
 
+" VISUALIZATION "
 # MODEL PLOT
 opsv.plot_model(node_labels=1, element_labels=1)
 plt.title("Estatic Model")
